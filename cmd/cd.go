@@ -1,12 +1,10 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/rivo/tview"
 	"github.com/spf13/cobra"
 )
 
@@ -14,27 +12,21 @@ import (
 var cdCmd = &cobra.Command{
 	Use:   "cd",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cd called")
+		app := tview.NewApplication()
+		flex := tview.NewFlex().
+			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+				AddItem(tview.NewBox().SetBorder(true).SetTitle("Top - Fixed - 1"), 3, 0, false).
+				AddItem(tview.NewBox().SetBorder(true).SetTitle("Middle Proportion"), 0, 1, false).
+				AddItem(tview.NewBox().SetBorder(true).SetTitle("Bottom Fixed - 1"), 3, 0, false),
+				0, 1, false)
+
+		if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
+			panic(err)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(cdCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// cdCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// cdCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
