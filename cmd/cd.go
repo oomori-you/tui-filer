@@ -11,6 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Flex struct {
+	Header *tview.TextView
+	Body   *tview.List
+	Footer *tview.InputField
+}
+
 // cdCmd represents the cd command
 var cdCmd = &cobra.Command{
 	Use:   "cd",
@@ -29,22 +35,46 @@ var cdCmd = &cobra.Command{
 
 		list := tview.NewList()
 		list.ShowSecondaryText(false).SetBorder(true).SetTitle("Middle Proportion")
-		files, _ := os.ReadDir(wdPath)
-		for _, v := range files {
-			list.AddItem(v.Name(), "", 0, nil)
-		}
+
+		f := new(Flex)
+		f.Header = textview
+		f.Body = list
+		f.Footer = inputField
+
+		f.ConstructList()
+		f.Body.SetInputCapture(f.CaptureList)
 
 		flex := tview.NewFlex().
 			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				AddItem(textview, 3, 0, false).
-				AddItem(list, 0, 1, false).
-				AddItem(inputField, 1, 0, true),
+				AddItem(f.Header, 3, 0, false).
+				AddItem(f.Body, 0, 1, false).
+				AddItem(f.Footer, 1, 0, true),
 				0, 1, true)
 
 		if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
 			panic(err)
 		}
 	},
+}
+
+func (f Flex) CaptureList(event *tcell.EventKey) *tcell.EventKey {
+	switch event.Key() {
+	case tcell.KeyEnter:
+		index := f.Body.GetCurrentItem()
+		main, _ := f.Body.GetItemText(index)
+		f.Header.SetText(f.Header.GetText(true) + "/" + main)
+		f.ConstructList()
+		return nil
+	}
+	return event // 上記以外のキー入力をdefaultのキーアクションへ伝える
+}
+
+func (f Flex) ConstructList() {
+	f.Body.Clear()
+	files, _ := os.ReadDir(f.Header.GetText(true))
+	for _, v := range files {
+		f.Body.AddItem(v.Name(), "", 0, nil)
+	}
 }
 
 func init() {
