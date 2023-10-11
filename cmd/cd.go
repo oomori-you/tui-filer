@@ -27,11 +27,17 @@ var cdCmd = &cobra.Command{
 			app.Stop()
 		})
 
+		list := tview.NewList()
+		list.ShowSecondaryText(false).SetBorder(true).SetTitle("Middle Proportion")
+		files, _ := os.ReadDir(wdPath)
+		for _, v := range files {
+			list.AddItem(v.Name(), "", 0, nil)
+		}
+
 		flex := tview.NewFlex().
 			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				//AddItem(textview.SetBorder(true).SetTitle("Top - Fixed - 1"), 30, 0, false).
 				AddItem(textview, 3, 0, false).
-				AddItem(tview.NewBox().SetBorder(true).SetTitle("Middle Proportion"), 0, 1, false).
+				AddItem(list, 0, 1, false).
 				AddItem(inputField, 1, 0, true),
 				0, 1, true)
 
