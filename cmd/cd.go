@@ -47,8 +47,8 @@ var cdCmd = &cobra.Command{
 		flex := tview.NewFlex().
 			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 				AddItem(f.Header, 3, 0, false).
-				AddItem(f.Body, 0, 1, false).
-				AddItem(f.Footer, 1, 0, true),
+				AddItem(f.Body, 0, 1, true).
+				AddItem(f.Footer, 1, 0, false),
 				0, 1, true)
 
 		if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
@@ -66,6 +66,18 @@ func (f Flex) CaptureList(event *tcell.EventKey) *tcell.EventKey {
 		f.ConstructList()
 		return nil
 	}
+
+	switch event.Rune() {
+	case 'h':
+		return tcell.NewEventKey(tcell.KeyLeft, ' ', tcell.ModNone)
+	case 'j':
+		return tcell.NewEventKey(tcell.KeyDown, ' ', tcell.ModNone)
+	case 'k':
+		return tcell.NewEventKey(tcell.KeyUp, ' ', tcell.ModNone)
+	case 'l':
+		return tcell.NewEventKey(tcell.KeyRight, ' ', tcell.ModNone)
+	}
+
 	return event // 上記以外のキー入力をdefaultのキーアクションへ伝える
 }
 
